@@ -1,6 +1,8 @@
 from fastapi import FastAPI, HTTPException, Query
 from fastapi import UploadFile, File, HTTPException
 from app.utils.exif import extract_exif_from_bytes
+from app.utils.john import get_john_speed, estimate_space, format_seconds, generate_feedback
+from app.models import JohnCrackRequest, JohnCrackResult
 from fastapi.responses import JSONResponse
 from typing import List, Any
 from celery.result import AsyncResult
@@ -71,3 +73,30 @@ async def exif_endpoint(file: UploadFile = File(...)):
         raise HTTPException(400, detail=f"Failed to parse EXIF: {e}")
     return metadata
 
+@app.post("/api/crack/john", response_model=JohnCrackResult)
+async def crack_with_john(req: JohnCrackRequest):
+    """
+    Estimate how long John the Ripper would take to brute-force the given password.
+    """
+    pwd = req.password
+    # 1) Benchmark speed
+    speed = get_john_speed()
+    if speed is None or speed <= 0:
+        raise HTTPException(500, detail="Failed to benchmark John the Ripper.")
+
+    # 2) Estimate keyspace
+    space = estimate_space(pwd)
+    if space == 0:
+        raise HTTPException(400, detail="Password must contain valid characters.")
+
+    # 3) Compute time & feedback
+    seconds = space / speed
+    human = format_seconds(seconds)
+    feedback = generate_feedback(seconds)
+
+    return JohnCrackResult(
+        speed=speed,
+        keyspace=space,
+        est_time=human,
+        feedback=feedback
+    )

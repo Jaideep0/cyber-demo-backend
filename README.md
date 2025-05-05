@@ -73,6 +73,37 @@ curl "http://localhost:8000/api/status/<UUID>"
 # → {"state":"SUCCESS","result":{ "22":{…}, "80":{…} }}
 ```
 
+### 1.4 John‑the‑Ripper Crack Endpoint
+
+```bash
+curl -X POST http://localhost:8000/api/crack/john \
+  -H "Content-Type: application/json" \
+  -d '{"password":"CorrectHorseBatteryStaple123!"}'
+```
+
+You should now get back JSON like:
+
+```json
+{
+  "speed": 50000000.0,
+  "keyspace": 916132832,
+  "est_time": "18 seconds",
+  "feedback": "😬 Weak—will be cracked in seconds."
+}
+```
+
+This confirms your updated helper is being invoked and you’re seeing real JtR benchmark results.
+
+### 1.5 EXIF-metadata endpoint
+
+```bash
+curl -X POST http://localhost:8000/api/exif \
+  -F "file=@/path/to/photo.jpg"
+```
+
+You should get back a JSON object of all EXIF tags (camera model, timestamps, GPS, etc.).
+
+
 ## Stopping and Cleaning Up
 
 When you're done, you can stop and remove the containers, networks, and volumes with:
