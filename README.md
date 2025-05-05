@@ -103,6 +103,31 @@ curl -X POST http://localhost:8000/api/exif \
 
 You should get back a JSON object of all EXIF tags (camera model, timestamps, GPS, etc.).
 
+### 1.6 Steganography Embed/Extract
+
+```bash
+curl -X POST http://localhost:8000/api/steg/embed \
+  -F "file=@/path/to/input.png" \
+  -F "message=Hello world" \
+  --output secret.png
+```
+
+```bash
+curl -X POST http://localhost:8000/api/steg/extract \
+  -F "file=@secret.png"
+# → {"message":"Hello world"}
+```
+
+This demonstrates embedding a message into an image and extracting it back using the steganography endpoints.
+
+```bash
+curl -X POST http://localhost:8000/api/exif \
+  -F "file=@/path/to/photo.jpg"
+```
+
+You should get back a JSON object of all EXIF tags (camera model, timestamps, GPS, etc.).
+
+
 
 ## Stopping and Cleaning Up
 

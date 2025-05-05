@@ -19,13 +19,18 @@ RUN pip install --no-cache-dir -r requirements.txt
 # ─── Stage 2: Final runtime image ───────────────────────────────────
 FROM python:3.11-slim
 
-# Install CLI demo tools
+# Install CLI demo tools and OpenCV dependencies for steganography
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
       exiftool \
       nmap \
       john \
       steghide \
+      libgl1-mesa-glx \
+      libglib2.0-0 \
+      libsm6 \
+      libxext6 \
+      libxrender1 \
  && rm -rf /var/lib/apt/lists/*
 
 # Copy Python environment (libs & console-scripts)
@@ -36,7 +41,6 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 WORKDIR /app
 COPY app/ ./app
 COPY celeryconfig.py .
-
 
 # Expose FastAPI port
 EXPOSE 8000
