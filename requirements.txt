@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+celery
+redis
+python-multipart
+zxcvbn
+exifread
+python-nmap
+scapy
+stegano

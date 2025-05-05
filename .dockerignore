@@ -1,0 +1,17 @@
+# Ignore Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Ignore your virtualenv
+venv/
+
+# Ignore local env file (we pass .env at runtime)
+.env
+
+# Ignore Mac metadata
+.DS_Store
+
+# Keep your app/ directory!
+# (Do NOT list `app/` here — we want to COPY it into the image)
+
