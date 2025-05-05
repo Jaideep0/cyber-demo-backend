@@ -1,4 +1,6 @@
 from fastapi import FastAPI, HTTPException, Query
+from fastapi import UploadFile, File, HTTPException
+from app.utils.exif import extract_exif_from_bytes
 from fastapi.responses import JSONResponse
 from typing import List, Any
 from celery.result import AsyncResult
@@ -56,3 +58,16 @@ async def get_status(task_id: str):
         )
     # other states: STARTED, RETRY, etc.
     return {"state": result.state}
+
+@app.post("/api/exif")
+async def exif_endpoint(file: UploadFile = File(...)):
+    """
+    Upload an image and return its EXIF metadata as JSON.
+    """
+    data = await file.read()
+    try:
+        metadata = extract_exif_from_bytes(data)
+    except Exception as e:
+        raise HTTPException(400, detail=f"Failed to parse EXIF: {e}")
+    return metadata
+
