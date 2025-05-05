@@ -125,10 +125,6 @@ curl -X POST http://localhost:8000/api/exif \
   -F "file=@/path/to/photo.jpg"
 ```
 
-You should get back a JSON object of all EXIF tags (camera model, timestamps, GPS, etc.).
-
-
-
 ## Stopping and Cleaning Up
 
 When you're done, you can stop and remove the containers, networks, and volumes with:
