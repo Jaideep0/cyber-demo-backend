@@ -118,7 +118,21 @@ curl -X POST http://localhost:8000/api/steg/extract \
 # → {"message":"Hello world"}
 ```
 
-This demonstrates embedding a message into an image and extracting it back using the steganography endpoints.
+### 1.7 ARP Scan (netdiscover)
+
+**Enqueue the ARP scan**
+
+```bash
+curl -X POST "http://localhost:8000/api/scan/netdiscover?network=192.168.1.0/24"
+# → {"task_id":"<UUID>"}
+```
+
+**Poll for status & result**
+
+```bash
+curl "http://localhost:8000/api/status/<UUID>"
+# → {"state":"SUCCESS","result":[{"ip":"192.168.1.10","mac":"aa:bb:cc:..."},…]}
+```
 
 ```bash
 curl -X POST http://localhost:8000/api/exif \
