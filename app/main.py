@@ -1,17 +1,36 @@
 from fastapi import FastAPI, HTTPException, Query, UploadFile, File, Form
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
 from typing import List
 import subprocess
 import io
 from celery.result import AsyncResult
 from app.models import SherlockResult, JohnCrackRequest, JohnCrackResult
-from app.tasks import scan_nmap
+from app.tasks import scan_nmap, scan_netdiscover
 from app.utils.exif import extract_exif_from_bytes
 from app.utils.password import score_password
 from app.utils.john import get_john_speed, estimate_space, format_seconds, generate_feedback
 from app.utils.steg import embed_message, extract_message
 
 app = FastAPI()
+
+origins = ["*"]
+
+# app.add_middleware(
+#   CORSMiddleware,
+#   allow_origins=["http://localhost:3000"],  # your frontend origin
+#   allow_credentials=True,
+#   allow_methods=["*"],
+#   allow_headers=["*"],
+# )
+
+app.add_middleware(
+  CORSMiddleware,
+  allow_origins=origins,  # your frontend origin
+  allow_credentials=True,
+  allow_methods=["*"],
+  allow_headers=["*"],
+)
 
 @app.get("/")
 async def root():
@@ -102,3 +121,10 @@ async def steg_extract(file: UploadFile = File(...)):
     except Exception as e:
         raise HTTPException(400, detail=f"Extraction failed: {e}")
     return {"message": msg}
+
+@app.post("/api/scan/netdiscover")
+async def enqueue_netdiscover(
+    network: str = Query(..., description="CIDR to scan, e.g. 192.168.1.0/24")
+):
+    task = scan_netdiscover.delay(network)
+    return {"task_id": task.id}

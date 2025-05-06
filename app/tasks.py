@@ -1,5 +1,7 @@
 # app/tasks.py
 
+from app.utils.netdiscover import arp_scan
+
 from app.celery_app import celery
 import nmap  # python-nmap wrapper
 
@@ -18,3 +20,7 @@ def scan_nmap(target: str):
         return {}
     # Return TCP port/services mapping
     return nm[target].get('tcp', {})
+
+@celery.task(name="app.tasks.scan_netdiscover")
+def scan_netdiscover(network: str):
+    return arp_scan(network)
