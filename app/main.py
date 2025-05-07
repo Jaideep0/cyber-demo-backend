@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Query, UploadFile, File, Form
+from fastapi import FastAPI, HTTPException, Query, UploadFile, File, Form, Body
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
 from typing import List
@@ -11,6 +11,7 @@ from app.utils.exif import extract_exif_from_bytes
 from app.utils.password import score_password
 from app.utils.john import get_john_speed, estimate_space, format_seconds, generate_feedback
 from app.utils.steg import embed_message, extract_message
+from app.utils.email import parse_email_headers
 
 app = FastAPI()
 
@@ -128,3 +129,11 @@ async def enqueue_netdiscover(
 ):
     task = scan_netdiscover.delay(network)
     return {"task_id": task.id}
+
+@app.post("/api/email/analyze")
+async def analyze_email(header: str = Body(..., description="Raw email headers")):
+    try:
+        data = parse_email_headers(header)
+    except Exception as e:
+        raise HTTPException(400, detail=f"Failed to parse headers: {e}")
+    return data

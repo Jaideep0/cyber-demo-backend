@@ -1,0 +1,5 @@
+From: alice@example.com
+To: bob@example.org
+Subject: Test Email
+Date: Tue, 5 May 2025 14:23:00 -0400
+Message-ID: <12345@example.com>

@@ -134,9 +134,26 @@ curl "http://localhost:8000/api/status/<UUID>"
 # → {"state":"SUCCESS","result":[{"ip":"192.168.1.10","mac":"aa:bb:cc:..."},…]}
 ```
 
+### 1.8 Header Analyzer (email header analysis)
+
+**Smoke‑test with curl:**
+
 ```bash
-curl -X POST http://localhost:8000/api/exif \
-  -F "file=@/path/to/photo.jpg"
+curl -X POST http://localhost:8000/api/email/analyze \
+  -H "Content-Type: text/plain" \
+  --data-binary @test-header.txt
+```
+
+You should get back a JSON object:
+
+```json
+{
+  "From": "alice@example.com",
+  "To": "bob@example.org",
+  "Subject": "Test Email",
+  "Date": "Tue, 5 May 2025 14:23:00 -0400",
+  "Message-ID": "<12345@example.com>"
+}
 ```
 
 ## Stopping and Cleaning Up
